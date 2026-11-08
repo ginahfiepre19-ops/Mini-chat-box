@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MyChat</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#111b21;
+color:white;
+}
+
+.app{
+max-width:500px;
+margin:auto;
+min-height:100vh;
+background:#202c33;
+}
+
+header{
+background:#202c33;
+padding:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header h1{
+margin:0;
+font-size:22px;
+color:#25d366;
+}
+
+.top-buttons{
+display:flex;
+gap:8px;
+}
+
+button{
+border:none;
+border-radius:8px;
+padding:10px 14px;
+background:#25d366;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:active{
+transform:scale(.95);
+}
+
+.red{
+background:#e53935;
+}
+
+.gray{
+background:#374045;
+}
+
+.search{
+padding:10px;
+background:#111b21;
+}
+
+.search input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#202c33;
+color:white;
+outline:none;
+}
+
+.chat{
+display:flex;
+align-items:center;
+padding:15px;
+border-bottom:1px solid #374045;
+cursor:pointer;
+}
+
+.chat:hover{
+background:#2a3942;
+}
+
+.avatar{
+width:50px;
+height:50px;
+border-radius:50%;
+background:#25d366;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+margin-right:15px;
+}
+
+.chat-info{
+flex:1;
+}
+
+.chat-info h3{
+margin:0 0 5px;
+}
+
+.chat-info p{
+margin:0;
+color:#aebac1;
+font-size:14px;
+}
+
+.time{
+color:#8696a0;
+font-size:12px;
+}
+
+.screen{
+display:none;
+padding:20px;
+}
+
+.screen.active{
+display:block;
+}
+
+.back{
+margin-bottom:20px;
+background:#374045;
+}
+
+.profile-box{
+text-align:center;
+padding:30px 10px;
+}
+
+.big-avatar{
+width:100px;
+height:100px;
+border-radius:50%;
+background:#25d366;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:45px;
+}
+
+.message-area{
+min-height:300px;
+max-height:400px;
+overflow-y:auto;
+background:#0b141a;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+.message{
+background:#005c4b;
+padding:10px;
+border-radius:8px;
+margin-bottom:10px;
+width:fit-content;
+max-width:80%;
+margin-left:auto;
+word-break:break-word;
+}
+
+.message-input{
+display:flex;
+gap:8px;
+}
+
+.message-input input{
+flex:1;
+padding:12px;
+border-radius:8px;
+border:none;
+outline:none;
+}
+
+.account-form{
+background:#111b21;
+padding:20px;
+border-radius:12px;
+margin-top:15px;
+}
+
+.account-form h3{
+margin-top:0;
+}
+
+.account-form input{
+width:100%;
+padding:13px;
+margin:7px 0;
+border:none;
+border-radius:8px;
+outline:none;
+}
+
+.account-form button{
+width:100%;
+margin-top:8px;
+}
+
+.account-info{
+background:#111b21;
+padding:20px;
+border-radius:12px;
+margin-top:15px;
+}
+
+.account-info p{
+color:#aebac1;
+}
+
+.account-info strong{
+color:white;
+}
+
+.status{
+padding:12px;
+border-radius:8px;
+background:#075e54;
+margin:10px 0;
+}
+
+.error{
+padding:12px;
+border-radius:8px;
+background:#7f1d1d;
+margin:10px 0;
+}
+
+.success{
+padding:12px;
+border-radius:8px;
+background:#166534;
+margin:10px 0;
+}
+
+.people-title{
+margin-top:0;
+color:#25d366;
+}
+
+.empty{
+text-align:center;
+padding:30px 10px;
+color:#8696a0;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+
+<!-- HOME -->
+
+<div id="homeScreen" class="screen active">
+
+<header>
+
+<h1>💬 MyChat</h1>
+
+<div class="top-buttons">
+
+<button onclick="openProfile()">
+👤
+</button>
+
+<button onclick="openAccount()">
+🔐
+</button>
+
+</div>
+
+</header>
+
+
+<div class="search">
+
+<input
+type="text"
+id="searchInput"
+placeholder="Search people..."
+oninput="searchPeople()"
+>
+
+</div>
+
+
+<div id="peopleList">
+
+</div>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div id="profileScreen" class="screen">
+
+<button
+class="back"
+onclick="goHome()"
+>
+← Back
+</button>
+
+<div class="profile-box">
+
+<div class="big-avatar">
+👤
+</div>
+
+<h2 id="profileName">
+My Profile
+</h2>
+
+<p id="profileStatus">
+Please create an account.
+</p>
+
+<button onclick="openAccount()">
+🔐 Account
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ACCOUNT -->
+
+<div id="accountScreen" class="screen">
+
+<button
+class="back"
+onclick="goHome()"
+>
+← Back
+</button>
+
+<h2>🔐 My Account</h2>
+
+<div id="accountMessage"></div>
+
+
+<div id="loggedOutArea">
+
+
+<div class="account-form">
+
+<h3>📝 Create Account</h3>
+
+<input
+id="signupName"
+type="text"
+placeholder="Your name"
+>
+
+<input
+id="signupEmail"
+type="email"
+placeholder="Email"
+>
+
+<input
+id="signupPassword"
+type="password"
+placeholder="Password"
+>
+
+<button onclick="createAccount()">
+Create Account
+</button>
+
+</div>
+
+
+<div class="account-form">
+
+<h3>🔑 Login</h3>
+
+<input
+id="loginEmail"
+type="email"
+placeholder="Email"
+>
+
+<input
+id="loginPassword"
+type="password"
+placeholder="Password"
+>
+
+<button onclick="login()">
+Login
+</button>
+
+</div>
+
+
+</div>
+
+
+<div
+id="loggedInArea"
+style="display:none;"
+>
+
+<div class="status">
+🟢 You are logged in
+</div>
+
+<div class="account-info">
+
+<p>
+<strong>Name:</strong>
+<span id="accountName"></span>
+</p>
+
+<p>
+<strong>Email:</strong>
+<span id="accountEmail"></span>
+</p>
+
+</div>
+
+<button
+class="red"
+onclick="logout()"
+>
+Logout
+</button>
+
+</div>
+
+</div>
+
+
+<!-- CHAT -->
+
+<div id="chatScreen" class="screen">
+
+<button
+class="back"
+onclick="goHome()"
+>
+← Back
+</button>
+
+<h2 id="chatName">
+Chat
+</h2>
+
+<div
+id="messageArea"
+class="message-area"
+>
+</div>
+
+<div class="message-input">
+
+<input
+id="messageInput"
+type="text"
+placeholder="Type a message..."
+onkeydown="handleMessageKey(event)"
+>
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+/* =================================
+   PEOPLE
+================================= */
+
+const people = [
+
+{
+name:"David",
+avatar:"👨"
+},
+
+{
+name:"Sarah",
+avatar:"👩"
+},
+
+{
+name:"Michael",
+avatar:"👨‍💻"
+}
+
+];
+
+
+/* =================================
+   CURRENT CHAT
+================================= */
+
+let currentChat = "";
+
+
+/* =================================
+   SCREEN NAVIGATION
+================================= */
+
+function showScreen(screenId){
+
+const screens =
+document.querySelectorAll(".screen");
+
+screens.forEach(function(screen){
+
+screen.classList.remove("active");
+
+});
+
+document
+.getElementById(screenId)
+.classList.add("active");
+
+}
+
+
+function goHome(){
+
+showScreen("homeScreen");
+
+updatePeopleList();
+
+}
+
+
+function openProfile(){
+
+updateProfile();
+
+showScreen("profileScreen");
+
+}
+
+
+function openAccount(){
+
+updateAccountScreen();
+
+showScreen("accountScreen");
+
+}
+
+
+/* =================================
+   PEOPLE LIST
+================================= */
+
+function displayPeople(list){
+
+const peopleList =
+document.getElementById("peopleList");
+
+peopleList.innerHTML="";
+
+
+if(list.length===0){
+
+peopleList.innerHTML =
+'<div class="empty">No people found.</div>';
+
+return;
+
+}
+
+
+list.forEach(function(person){
+
+const chat =
+document.createElement("div");
+
+chat.className="chat";
+
+
+chat.onclick=function(){
+
+openChat(person.name);
+
+};
+
+
+chat.innerHTML=
+
+'<div class="avatar">'+
+person.avatar+
+'</div>'+
+
+'<div class="chat-info">'+
+
+'<h3>'+
+person.name+
+'</h3>'+
+
+'<p id="preview-'+
+person.name+
+'">'+
+getPreview(person.name)+
+'</p>'+
+
+'</div>'+
+
+'<div class="time">'+
+'Now'+
+'</div>';
+
+
+peopleList.appendChild(chat);
+
+});
+
+}
+
+
+function updatePeopleList(){
+
+displayPeople(people);
+
+}
+
+
+function searchPeople(){
+
+const search =
+document
+.getElementById("searchInput")
+.value
+.toLowerCase()
+.trim();
+
+
+const filtered =
+people.filter(function(person){
+
+return person.name
+.toLowerCase()
+.includes(search);
+
+});
+
+
+displayPeople(filtered);
+
+}
+
+
+/* =================================
+   CHAT STORAGE
+================================= */
+
+function getMessages(){
+
+const saved =
+localStorage.getItem(
+"mychat_messages"
+);
+
+
+if(!saved){
+
+return {};
+
+}
+
+
+return JSON.parse(saved);
+
+}
+
+
+function saveMessages(messages){
+
+localStorage.setItem(
+"mychat_messages",
+JSON.stringify(messages)
+);
+
+}
+
+
+/* =================================
+   OPEN CHAT
+================================= */
+
+function openChat(name){
+
+currentChat=name;
+
+
+document
+.getElementById("chatName")
+.textContent=
+"Chat with "+name;
+
+
+loadChatMessages(name);
+
+
+showScreen("chatScreen");
+
+
+setTimeout(function(){
+
+document
+.getElementById("messageInput")
+.focus();
+
+},100);
+
+}
+
+
+/* =================================
+   LOAD CHAT
+================================= */
+
+function loadChatMessages(name){
+
+const allMessages =
+getMessages();
+
+
+const messages =
+allMessages[name] || [];
+
+
+const area =
+document.getElementById(
+"messageArea"
+);
+
+
+area.innerHTML="";
+
+
+if(messages.length===0){
+
+const welcome =
+document.createElement("div");
+
+welcome.className="message";
+
+welcome.textContent=
+"Hello! 👋";
+
+area.appendChild(welcome);
+
+return;
+
+}
+
+
+messages.forEach(function(text){
+
+const message =
+document.createElement("div");
+
+message.className="message";
+
+message.textContent=text;
+
+area.appendChild(message);
+
+});
+
+
+area.scrollTop=
+area.scrollHeight;
+
+}
+
+
+/* =================================
+   SEND MESSAGE
+================================= */
+
+function sendMessage(){
+
+if(!currentChat){
+
+return;
+
+}
+
+
+const input =
+document.getElementById(
+"messageInput"
+);
+
+
+const text =
+input.value.trim();
+
+
+if(text===""){
+
+return;
+
+}
+
+
+const allMessages =
+getMessages();
+
+
+if(!allMessages[currentChat]){
+
+allMessages[currentChat]=[];
+
+}
+
+
+allMessages[currentChat].push(text);
+
+
+saveMessages(allMessages);
+
+
+input.value="";
+
+
+loadChatMessages(currentChat);
+
+
+input.focus();
+
+}
+
+
+/* =================================
+   ENTER TO SEND
+================================= */
+
+function handleMessageKey(event){
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+
+sendMessage();
+
+}
+
+}
+
+
+/* =================================
+   CHAT PREVIEW
+================================= */
+
+function getPreview(name){
+
+const allMessages =
+getMessages();
+
+
+const messages =
+allMessages[name] || [];
+
+
+if(messages.length===0){
+
+if(name==="David"){
+
+return "Hello, how are you?";
+
+}
+
+if(name==="Sarah"){
+
+return "See you tomorrow!";
+
+}
+
+if(name==="Michael"){
+
+return "Check out this project.";
+
+}
+
+}
+
+
+return messages[messages.length-1];
+
+}
+
+
+/* =================================
+   ACCOUNT STORAGE
+================================= */
+
+function getUsers(){
+
+const users =
+localStorage.getItem(
+"mychat_users"
+);
+
+
+if(!users){
+
+return [];
+
+}
+
+
+return JSON.parse(users);
+
+}
+
+
+function saveUsers(users){
+
+localStorage.setItem(
+"mychat_users",
+JSON.stringify(users)
+);
+
+}
+
+
+function getLoggedInUser(){
+
+const email =
+localStorage.getItem(
+"mychat_logged_in"
+);
+
+
+if(!email){
+
+return null;
+
+}
+
+
+const users =
+getUsers();
+
+
+return users.find(
+function(user){
+
+return user.email===email;
+
+}
+) || null;
+
+}
+
+
+/* =================================
+   CREATE ACCOUNT
+================================= */
+
+function createAccount(){
+
+clearAccountMessage();
+
+
+const name =
+document
+.getElementById("signupName")
+.value
+.trim();
+
+
+const email =
+document
+.getElementById("signupEmail")
+.value
+.trim()
+.toLowerCase();
+
+
+const password =
+document
+.getElementById("signupPassword")
+.value;
+
+
+if(!name){
+
+showAccountError(
+"Please enter your name."
+);
+
+return;
+
+}
+
+
+if(!email){
+
+showAccountError(
+"Please enter your email."
+);
+
+return;
+
+}
+
+
+if(!email.includes("@")){
+
+showAccountError(
+"Please enter a valid email."
+);
+
+return;
+
+}
+
+
+if(password.length<6){
+
+showAccountError(
+"Password must be at least 6 characters."
+);
+
+return;
+
+}
+
+
+const users =
+getUsers();
+
+
+const existingUser =
+users.find(
+function(user){
+
+return user.email===email;
+
+}
+);
+
+
+if(existingUser){
+
+showAccountError(
+"An account with this email already exists."
+);
+
+return;
+
+}
+
+
+users.push({
+
+name:name,
+
+email:email,
+
+password:password
+
+});
+
+
+saveUsers(users);
+
+
+localStorage.setItem(
+"mychat_logged_in",
+email
+);
+
+
+updateAccountScreen();
+
+updateProfile();
+
+
+showAccountSuccess(
+"Account created successfully! 🎉"
+);
+
+}
+
+
+/* =================================
+   LOGIN
+================================= */
+
+function login(){
+
+clearAccountMessage();
+
+
+const email =
+document
+.getElementById("loginEmail")
+.value
+.trim()
+.toLowerCase();
+
+
+const password =
+document
+.getElementById("loginPassword")
+.value;
+
+
+if(!email || !password){
+
+showAccountError(
+"Please enter your email and password."
+);
+
+return;
+
+}
+
+
+const users =
+getUsers();
+
+
+const user =
+users.find(
+function(user){
+
+return(
+user.email===email &&
+user.password===password
+);
+
+}
+);
+
+
+if(!user){
+
+showAccountError(
+"Incorrect email or password."
+);
+
+return;
+
+}
+
+
+localStorage.setItem(
+"mychat_logged_in",
+email
+);
+
+
+updateAccountScreen();
+
+updateProfile();
+
+
+showAccountSuccess(
+"Login successful! 🎉"
+);
+
+}
+
+
+/* =================================
+   LOGOUT
+================================= */
+
+function logout(){
+
+localStorage.removeItem(
+"mychat_logged_in"
+);
+
+
+updateAccountScreen();
+
+updateProfile();
+
+
+showAccountSuccess(
+"You have been logged out."
+);
+
+}
+
+
+/* =================================
+   ACCOUNT SCREEN
+================================= */
+
+function updateAccountScreen(){
+
+const user =
+getLoggedInUser();
+
+
+const loggedOutArea =
+document.getElementById(
+"loggedOutArea"
+);
+
+
+const loggedInArea =
+document.getElementById(
+"loggedInArea"
+);
+
+
+if(user){
+
+loggedOutArea.style.display=
+"none";
+
+loggedInArea.style.display=
+"block";
+
+
+document
+.getElementById("accountName")
+.textContent=
+user.name;
+
+
+document
+.getElementById("accountEmail")
+.textContent=
+user.email;
+
+}else{
+
+loggedOutArea.style.display=
+"block";
+
+loggedInArea.style.display=
+"none";
+
+}
+
+}
+
+
+/* =================================
+   PROFILE
+================================= */
+
+function updateProfile(){
+
+const user =
+getLoggedInUser();
+
+
+const profileName =
+document.getElementById(
+"profileName"
+);
+
+
+const profileStatus =
+document.getElementById(
+"profileStatus"
+);
+
+
+if(user){
+
+profileName.textContent=
+user.name;
+
+
+profileStatus.textContent=
+"🟢 Account active • "+
+user.email;
+
+}else{
+
+profileName.textContent=
+"My Profile";
+
+
+profileStatus.textContent=
+"Please create an account.";
+
+}
+
+}
+
+
+/* =================================
+   ACCOUNT MESSAGES
+================================= */
+
+function clearAccountMessage(){
+
+document
+.getElementById(
+"accountMessage"
+)
+.innerHTML="";
+
+}
+
+
+function showAccountError(message){
+
+document
+.getElementById(
+"accountMessage"
+)
+.innerHTML=
+'<div class="error">'+
+message+
+'</div>';
+
+}
+
+
+function showAccountSuccess(message){
+
+document
+.getElementById(
+"accountMessage"
+)
+.innerHTML=
+'<div class="success">'+
+message+
+'</div>';
+
+}
+
+
+/* =================================
+   START
+================================= */
+
+updateAccountScreen();
+
+updateProfile();
+
+updatePeopleList();
+
+</script>
+
+</body>
+</html>
